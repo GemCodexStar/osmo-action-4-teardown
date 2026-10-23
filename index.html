@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#05080c" />
+    <meta
+      name="description"
+      content="DJI Osmo Action 4 三维交互拆解实验室 — 点击部件查看结构、参数与拆解动画。"
+    />
+    <title>OSMO ACTION 4 / 3D Teardown Lab</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23060c11'/%3E%3Cpath d='M12 38V26h8v12zm12 0V20h8v18zm12 0V28l8-8h8L40 32v6z' fill='%235ee7ff'/%3E%3Ccircle cx='50' cy='16' r='4' fill='%23ff6f61'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app noise-overlay" id="app">
+      <div class="global-glow" aria-hidden="true"></div>
+
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">
+            DJI<span class="brand-mark-dot"></span>
+          </div>
+          <span class="brand-divider"></span>
+          <div class="brand-copy">
+            <div class="brand-kicker">OSMO ACTION 4</div>
+            <div class="brand-sub">INTERACTIVE TEARDOWN <span>/</span> 拆解实验室</div>
+          </div>
+        </div>
+
+        <div class="top-center" aria-live="polite">
+          <span class="live-pill"><i></i> LIVE STRUCTURE</span>
+          <span class="top-line"></span>
+          <span id="topState" class="top-state">ASSEMBLED</span>
+        </div>
+
+        <div class="top-meta">
+          <div class="meta-cell">
+            <span>SENSOR</span>
+            <strong>1/1.3" CMOS</strong>
+          </div>
+          <div class="meta-cell meta-cell--hide-sm">
+            <span>WEIGHT</span>
+            <strong>145 g</strong>
+          </div>
+          <button class="round-button" id="guideBtn" type="button" aria-label="查看操作指南">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="8.4" />
+              <path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.4c-.8.35-1 .8-1 1.65" />
+              <path d="M12 16.7v.1" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="side-panel left-panel" aria-label="部件清单">
+          <div class="panel-head">
+            <div>
+              <span class="micro-label">01 / COMPONENT INDEX</span>
+              <h1>部件清单</h1>
+            </div>
+            <div class="count-badge"><b id="explodedCount">00</b><span>/ 12</span></div>
+          </div>
+
+          <div class="teardown-progress">
+            <div class="progress-copy">
+              <span>TEARDOWN PROGRESS</span>
+              <b id="progressText">0%</b>
+            </div>
+            <div class="progress-track"><i id="progressBar"></i></div>
+          </div>
+
+          <nav class="part-list custom-scroll" id="partList" aria-label="可拆解部件"></nav>
+
+          <div class="panel-foot">
+            <div class="ref-line">
+              <span class="ref-cross">+</span>
+              REF. 70.5 × 44.2 × 32.8 mm
+            </div>
+            <p>点击部件或清单项开始拆解</p>
+          </div>
+        </aside>
+
+        <section class="stage" id="stage" aria-label="DJI Osmo Action 4 三维模型">
+          <div class="stage-corner stage-corner--tl" aria-hidden="true"></div>
+          <div class="stage-corner stage-corner--tr" aria-hidden="true"></div>
+          <div class="stage-corner stage-corner--bl" aria-hidden="true"></div>
+          <div class="stage-corner stage-corner--br" aria-hidden="true"></div>
+
+          <div class="stage-hud stage-hud--top-left">
+            <span class="micro-label">MODEL / OA4-2023</span>
+            <div class="view-state" id="viewState"><i></i><span>ASSEMBLED VIEW</span></div>
+          </div>
+
+          <div class="stage-hud stage-hud--top-right">
+            <span class="tiny-cap">OPTICAL AXIS / Z+</span>
+            <span class="tiny-cap tiny-cap--dim">PERSPECTIVE 34°</span>
+          </div>
+
+          <div class="stage-watermark" aria-hidden="true">
+            <span>ACTION</span><b>4</b>
+          </div>
+
+          <div class="axis-widget" aria-hidden="true">
+            <svg viewBox="0 0 92 92">
+              <circle cx="48" cy="48" r="33" class="axis-orbit" />
+              <circle cx="48" cy="48" r="2.8" class="axis-core" />
+              <path d="M48 48 L48 16" class="axis-line axis-line--y" />
+              <path d="M48 48 L76 61" class="axis-line axis-line--x" />
+              <path d="M48 48 L26 63" class="axis-line axis-line--z" />
+              <text x="44" y="12" class="axis-text axis-text--y">Y</text>
+              <text x="80" y="68" class="axis-text axis-text--x">X</text>
+              <text x="15" y="70" class="axis-text axis-text--z">Z</text>
+            </svg>
+          </div>
+
+          <div class="annotation-layer" id="annotationLayer"></div>
+          <svg class="leader-layer" id="leaderLayer" aria-hidden="true"></svg>
+
+          <div class="stage-hud stage-hud--bottom-left">
+            <span class="scan-line"></span>
+            <span class="tiny-cap">STRUCTURAL SCAN / ACTIVE</span>
+          </div>
+
+          <div class="stage-hud stage-hud--bottom-right">
+            <div class="zoom-readout">
+              <span>VIEW</span>
+              <b id="zoomValue">100%</b>
+            </div>
+            <div class="stage-hint">
+              <span class="mouse-glyph">
+                <svg viewBox="0 0 16 22" aria-hidden="true">
+                  <rect x="1" y="1" width="14" height="20" rx="7" />
+                  <path d="M8 5v4" />
+                </svg>
+              </span>
+              拖拽旋转 · 滚轮缩放
+            </div>
+          </div>
+
+          <div class="hover-tip" id="hoverTip">
+            <span class="hover-tip__key">CLICK</span>
+            <div class="hover-tip__copy">
+              <b id="hoverTipName">镜头模组</b>
+              <span>点击拆解 / EXPLODE PART</span>
+            </div>
+          </div>
+
+          <div class="stage-focus" id="stageFocus" aria-live="polite">
+            <span id="focusNumber">01</span>
+            <span id="focusName">超广角镜头模组</span>
+          </div>
+        </section>
+
+        <aside class="side-panel right-panel" aria-label="参数面板">
+          <div class="panel-head panel-head--right">
+            <div>
+              <span class="micro-label">02 / SPECIFICATION</span>
+              <h1>参数面板</h1>
+            </div>
+            <button class="panel-back" id="overviewBtn" type="button" aria-label="返回整机概览" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7h16M4 12h16M4 17h10" />
+              </svg>
+              <span>OVERVIEW</span>
+            </button>
+          </div>
+
+          <div class="details-scroll custom-scroll" id="detailsScroll"></div>
+
+          <div class="panel-foot panel-foot--right">
+            <span>DATA / DJI PUBLIC SPECIFICATIONS</span>
+            <p>结构拆解为可视化示意</p>
+          </div>
+        </aside>
+      </main>
+
+      <footer class="controlbar">
+        <div class="control-copy">
+          <span class="micro-label">INTERACTION</span>
+          <div class="control-hints">
+            <span><i class="hint-key">LMB</i> 旋转</span>
+            <span><i class="hint-key">SCROLL</i> 缩放</span>
+            <span><i class="hint-key">CLICK</i> 拆解</span>
+          </div>
+        </div>
+
+        <div class="control-actions">
+          <button class="ctrl-btn ctrl-btn--primary" id="explodeAllBtn" data-action="explode" type="button">
+            <span class="ctrl-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v4M12 17v4M3 12h4M17 12h4" />
+                <path d="m5.6 5.6 2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8" />
+                <rect x="9" y="9" width="6" height="6" rx="1" />
+              </svg>
+            </span>
+            <span class="ctrl-copy"><b>全部拆解</b><small>EXPLODE ALL</small></span>
+            <kbd>E</kbd>
+          </button>
+
+          <button class="ctrl-btn" id="resetBtn" data-action="reset" type="button">
+            <span class="ctrl-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4.8 9.2A8 8 0 1 1 4 12" />
+                <path d="M4.2 4.4v5.2h5.2" />
+              </svg>
+            </span>
+            <span class="ctrl-copy"><b>复位</b><small>RESET</small></span>
+            <kbd>R</kbd>
+          </button>
+
+          <button class="ctrl-btn" id="rotateBtn" data-action="rotate" type="button">
+            <span class="ctrl-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <ellipse cx="12" cy="12" rx="9" ry="4.2" />
+                <path d="M15.8 8.6 21 7l-3.1 4.5" />
+                <circle cx="12" cy="12" r="2" />
+              </svg>
+            </span>
+            <span class="ctrl-copy"><b>自动旋转</b><small>AUTO ORBIT</small></span>
+            <kbd>A</kbd>
+          </button>
+
+          <button class="ctrl-btn is-on" id="labelsBtn" data-action="labels" type="button">
+            <span class="ctrl-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 6.2h7.2l8.8 5.8-8.8 5.8H4z" />
+                <circle cx="8.2" cy="12" r="1.1" />
+              </svg>
+            </span>
+            <span class="ctrl-copy"><b>标注</b><small>ANNOTATIONS</small></span>
+            <kbd>L</kbd>
+          </button>
+        </div>
+
+        <div class="teardown-status">
+          <span class="micro-label">STRUCTURE STATE</span>
+          <div class="segments" id="segments" aria-hidden="true"></div>
+          <span class="teardown-index"><b id="teardownIndex">00</b> / 12</span>
+        </div>
+      </footer>
+
+      <div class="loader" id="loader" role="status" aria-label="正在载入三维模型">
+        <div class="loader-glow"></div>
+        <div class="loader-inner">
+          <div class="loader-brand">DJI <span>//</span> TEARDOWN LAB</div>
+          <div class="loader-title">OSMO ACTION <em>4</em></div>
+          <div class="loader-sub">INITIALIZING 3D STRUCTURE</div>
+          <div class="loader-track"><i id="loaderBar"></i></div>
+          <div class="loader-meta"><span id="loaderMessage">BUILDING OPTICAL ARRAY</span><span id="loaderPct">00</span></div>
+        </div>
+        <span class="loader-corner loader-corner--tl"></span>
+        <span class="loader-corner loader-corner--tr"></span>
+        <span class="loader-corner loader-corner--bl"></span>
+        <span class="loader-corner loader-corner--br"></span>
+      </div>
+
+      <div class="modal" id="guideModal" hidden>
+        <div class="modal-backdrop" data-close-modal></div>
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+          <button class="modal-close" type="button" data-close-modal aria-label="关闭操作指南">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+          </button>
+          <span class="micro-label">CONTROL MANUAL / 操作指南</span>
+          <h2 id="guideTitle">拆解这台 Action 4</h2>
+          <p class="modal-intro">用鼠标自由查看整机结构。每次点击都会把对应部件从机身中分离，并在右侧读取它的技术参数。</p>
+          <div class="guide-grid">
+            <div class="guide-item">
+              <span>01</span>
+              <b>点击拆解</b>
+              <p>点击模型部件或左侧清单，单件分离并高亮。</p>
+            </div>
+            <div class="guide-item">
+              <span>02</span>
+              <b>自由查看</b>
+              <p>按住左键拖拽旋转，滚轮缩放，从任意角度观察。</p>
+            </div>
+            <div class="guide-item">
+              <span>03</span>
+              <b>全部拆解</b>
+              <p>按下 E 键或底部按钮，展开全部 12 个结构模块。</p>
+            </div>
+            <div class="guide-item">
+              <span>04</span>
+              <b>标注与复位</b>
+              <p>L 键切换三维标注，R 键让模型与镜头回到初始状态。</p>
+            </div>
+          </div>
+          <div class="shortcut-row">
+            <span><kbd>E</kbd> 全部拆解</span>
+            <span><kbd>R</kbd> 复位</span>
+            <span><kbd>A</kbd> 自动旋转</span>
+            <span><kbd>L</kbd> 标注</span>
+            <span><kbd>ESC</kbd> 关闭面板</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="error-state" id="errorState" hidden>
+        <b>WEBGL UNAVAILABLE</b>
+        <p>当前浏览器无法启动 3D 渲染，请使用支持 WebGL 2 的现代浏览器。</p>
+      </div>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

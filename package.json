@@ -1,0 +1,20 @@
+{
+  "name": "osmo-action-4-teardown",
+  "version": "1.0.0",
+  "description": "Interactive Three.js teardown lab for DJI Osmo Action 4",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --format=iife --target=chrome100 --outfile=app.js --legal-comments=none",
+    "watch": "esbuild src/main.js --bundle --format=iife --target=chrome100 --outfile=app.js --watch",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}
